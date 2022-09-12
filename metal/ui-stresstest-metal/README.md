@@ -6,11 +6,11 @@ Avoid stalls between CPU and GPU work by using multiple instances of a resource.
 
 In this sample code project, you learn how to manage data dependencies and avoid processor stalls between the CPU and the GPU.
 
-The project continuously renders triangles along a sine wave. In each frame, the sample updates the position of each triangle's vertices and then renders a new image. These dynamic data updates create an illusion of motion, where the triangles appear to move along the sine wave.
+The project continuously renders squares along a sine wave. In each frame, the sample updates the position of each square's vertices and then renders a new image. These dynamic data updates create an illusion of motion, where the squares appear to move along the sine wave.
 
-![A screenshot of the sample code project, showing colored triangles rendered along a sine wave.](Documentation/SampleScreenshot.png)
+![A screenshot of the sample code project, showing colored squares rendered along a sine wave.](Documentation/SampleScreenshot.png)
 
-The sample stores the triangle vertices in a buffer that's shared between the CPU and the GPU. The CPU writes data to the buffer and the GPU reads it.
+The sample stores the square vertices in a buffer that's shared between the CPU and the GPU. The CPU writes data to the buffer and the GPU reads it.
 
 - Note: The Xcode project contains schemes for running the sample on macOS, iOS, and tvOS. The default scheme is macOS, which runs the sample on your Mac.
 
@@ -38,54 +38,54 @@ typedef struct
 } AAPLVertex;
 ```
 
-Define a custom `AAPLTriangle` class that provides an interface to a default triangle, which is made up of 3 vertices:
+Define a custom `AAPLSquare` class that provides an interface to a default square, which is made up of 3 vertices:
 
 ``` objective-c
 +(const AAPLVertex *)vertices
 {
-    const float TriangleSize = 64;
-    static const AAPLVertex triangleVertices[] =
+    const float SquareSize = 64;
+    static const AAPLVertex squareVertices[] =
     {
         // Pixel Positions,                          RGBA colors.
-        { { -0.5*TriangleSize, -0.5*TriangleSize },  { 1, 1, 1, 1 } },
-        { {  0.0*TriangleSize, +0.5*TriangleSize },  { 1, 1, 1, 1 } },
-        { { +0.5*TriangleSize, -0.5*TriangleSize },  { 1, 1, 1, 1 } }
+        { { -0.5*SquareSize, -0.5*SquareSize },  { 1, 1, 1, 1 } },
+        { {  0.0*SquareSize, +0.5*SquareSize },  { 1, 1, 1, 1 } },
+        { { +0.5*SquareSize, -0.5*SquareSize },  { 1, 1, 1, 1 } }
     };
-    return triangleVertices;
+    return squareVertices;
 }
 ```
 
-Initialize multiple triangle vertices with a position and a color, and store them in an array of triangles, `_triangles`:
+Initialize multiple square vertices with a position and a color, and store them in an array of squares, `_squares`:
 
 ``` objective-c
-NSMutableArray *triangles = [[NSMutableArray alloc] initWithCapacity:NumTriangles];
+NSMutableArray *squares = [[NSMutableArray alloc] initWithCapacity:NumSquares];
 
-// Initialize each triangle.
-for(NSUInteger t = 0; t < NumTriangles; t++)
+// Initialize each square.
+for(NSUInteger t = 0; t < NumSquares; t++)
 {
-    vector_float2 trianglePosition;
+    vector_float2 squarePosition;
 
-    // Determine the starting position of the triangle in a horizontal line.
-    trianglePosition.x = ((-((float)NumTriangles) / 2.0) + t) * horizontalSpacing;
-    trianglePosition.y = 0.0;
+    // Determine the starting position of the square in a horizontal line.
+    squarePosition.x = ((-((float)NumSquares) / 2.0) + t) * horizontalSpacing;
+    squarePosition.y = 0.0;
 
-    // Create the triangle, set its properties, and add it to the array.
-    AAPLTriangle * triangle = [AAPLTriangle new];
-    triangle.position = trianglePosition;
-    triangle.color = Colors[t % NumColors];
-    [triangles addObject:triangle];
+    // Create the square, set its properties, and add it to the array.
+    AAPLSquare * square = [AAPLSquare new];
+    square.position = squarePosition;
+    square.color = Colors[t % NumColors];
+    [squares addObject:square];
 }
-_triangles = triangles;
+_squares = squares;
 ```
 
 ## Allocate Data Storage
 
-Calculate the total storage size of your triangle vertices. Your app renders 50 triangles; each triangle has 3 vertices, totaling 150 vertices, and each vertex is the size of `AAPLVertex`:
+Calculate the total storage size of your square vertices. Your app renders 50 squares; each square has 3 vertices, totaling 150 vertices, and each vertex is the size of `AAPLVertex`:
 
 ``` objective-c
-const NSUInteger triangleVertexCount = [AAPLTriangle vertexCount];
-_totalVertexCount = triangleVertexCount * _triangles.count;
-const NSUInteger triangleVertexBufferSize = _totalVertexCount * sizeof(AAPLVertex);
+const NSUInteger squareVertexCount = [AAPLSquare vertexCount];
+_totalVertexCount = squareVertexCount * _squares.count;
+const NSUInteger squareVertexBufferSize = _totalVertexCount * sizeof(AAPLVertex);
 ```
 
 Initialize multiple buffers to store multiple copies of your vertex data. For each buffer, allocate exactly enough memory to store 150 vertices:
@@ -93,7 +93,7 @@ Initialize multiple buffers to store multiple copies of your vertex data. For ea
 ``` objective-c
 for(NSUInteger bufferIndex = 0; bufferIndex < MaxFramesInFlight; bufferIndex++)
 {
-    _vertexBuffers[bufferIndex] = [_device newBufferWithLength:triangleVertexBufferSize
+    _vertexBuffers[bufferIndex] = [_device newBufferWithLength:squareVertexBufferSize
                                                        options:MTLResourceStorageModeShared];
     _vertexBuffers[bufferIndex].label = [NSString stringWithFormat:@"Vertex Buffer #%lu", (unsigned long)bufferIndex];
 }
@@ -106,26 +106,26 @@ Upon initialization, the contents of the buffer instances in the `_vertexBuffers
 In each frame, at the start of the [`drawInMTKView:`][01] render loop, use the CPU to update the contents of one buffer instance in the `updateState` method:
 
 ``` objective-c
-// Vertex data for the current triangles.
-AAPLVertex *currentTriangleVertices = _vertexBuffers[_currentBuffer].contents;
+// Vertex data for the current squares.
+AAPLVertex *currentSquareVertices = _vertexBuffers[_currentBuffer].contents;
 
-// Update each triangle.
-for(NSUInteger triangle = 0; triangle < NumTriangles; triangle++)
+// Update each square.
+for(NSUInteger square = 0; square < NumSquares; square++)
 {
-    vector_float2 trianglePosition = _triangles[triangle].position;
+    vector_float2 squarePosition = _squares[square].position;
 
-    // Displace the y-position of the triangle using a sine wave.
-    trianglePosition.y = (sin(trianglePosition.x/waveMagnitude + _wavePosition) * waveMagnitude);
+    // Displace the y-position of the square using a sine wave.
+    squarePosition.y = (sin(squarePosition.x/waveMagnitude + _wavePosition) * waveMagnitude);
 
-    // Update the position of the triangle.
-    _triangles[triangle].position = trianglePosition;
+    // Update the position of the square.
+    _squares[square].position = squarePosition;
 
-    // Update the vertices of the current vertex buffer with the triangle's new position.
-    for(NSUInteger vertex = 0; vertex < triangleVertexCount; vertex++)
+    // Update the vertices of the current vertex buffer with the square's new position.
+    for(NSUInteger vertex = 0; vertex < squareVertexCount; vertex++)
     {
-        NSUInteger currentVertex = vertex + (triangle * triangleVertexCount);
-        currentTriangleVertices[currentVertex].position = triangleVertices[vertex].position + _triangles[triangle].position;
-        currentTriangleVertices[currentVertex].color = _triangles[triangle].color;
+        NSUInteger currentVertex = vertex + (square * squareVertexCount);
+        currentSquareVertices[currentVertex].position = squareVertices[vertex].position + _squares[square].position;
+        currentSquareVertices[currentVertex].color = _squares[square].color;
     }
 }
 ```
@@ -148,8 +148,8 @@ Next, you encode commands that reference the buffer instance in a render pass:
                        length:sizeof(_viewportSize)
                       atIndex:AAPLVertexInputIndexViewportSize];
 
-// Draw the triangle vertices.
-[renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
+// Draw the square vertices.
+[renderEncoder drawPrimitives:MTLPrimitiveTypeSquare
                   vertexStart:0
                   vertexCount:_totalVertexCount];
 ```

@@ -28,9 +28,7 @@
 		3ABBACEF1F7315560080C72C /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABBACEE1F73154F0080C72C /* MetalKit.framework */; };
 		3ABBACF01F73155A0080C72C /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABBACED1F73154F0080C72C /* MetalKit.framework */; };
 		3ABBACF11F73155D0080C72C /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABBACEC1F73154F0080C72C /* MetalKit.framework */; };
-		3B7DB4B02224728500E6FD4F /* AAPLTriangle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7DB4AF2224728500E6FD4F /* AAPLTriangle.m */; };
-		3B7DB4B12224728500E6FD4F /* AAPLTriangle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7DB4AF2224728500E6FD4F /* AAPLTriangle.m */; };
-		3B7DB4B22224728500E6FD4F /* AAPLTriangle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B7DB4AF2224728500E6FD4F /* AAPLTriangle.m */; };
+		E18F367E28CF29C0004C2340 /* AAPLSquare.m in Sources */ = {isa = PBXBuildFile; fileRef = E18F367C28CF29C0004C2340 /* AAPLSquare.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,8 +56,8 @@
 		3ABBACED1F73154F0080C72C /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		3ABBACEE1F73154F0080C72C /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS11.0.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		3AC448951EC126D7006F9D6B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		3B7DB4AE2224728500E6FD4F /* AAPLTriangle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AAPLTriangle.h; sourceTree = "<group>"; };
-		3B7DB4AF2224728500E6FD4F /* AAPLTriangle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AAPLTriangle.m; sourceTree = "<group>"; };
+		E18F367C28CF29C0004C2340 /* AAPLSquare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AAPLSquare.m; sourceTree = "<group>"; };
+		E18F367D28CF29C0004C2340 /* AAPLSquare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AAPLSquare.h; sourceTree = "<group>"; };
 		EC3075EBE6949A5BE52BA609 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -152,10 +150,10 @@
 			children = (
 				3A7072D11EBD4A66001F05E4 /* AAPLRenderer.h */,
 				3A7072D21EBD4A66001F05E4 /* AAPLRenderer.m */,
-				3B7DB4AE2224728500E6FD4F /* AAPLTriangle.h */,
-				3B7DB4AF2224728500E6FD4F /* AAPLTriangle.m */,
 				3A7072D31EBD4A66001F05E4 /* AAPLShaderTypes.h */,
 				3A7072D41EBD4A66001F05E4 /* AAPLShaders.metal */,
+				E18F367D28CF29C0004C2340 /* AAPLSquare.h */,
+				E18F367C28CF29C0004C2340 /* AAPLSquare.m */,
 			);
 			path = Renderer;
 			sourceTree = "<group>";
@@ -329,7 +327,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3A1E2E281F71B59200A7B165 /* main.m in Sources */,
-				3B7DB4B12224728500E6FD4F /* AAPLTriangle.m in Sources */,
 				3A70731D1EBD4A67001F05E4 /* AAPLRenderer.m in Sources */,
 				3A1E2E1E1F71B4DC00A7B165 /* AAPLViewController.m in Sources */,
 				3A1E2E221F71B4E400A7B165 /* AAPLAppDelegate.m in Sources */,
@@ -342,7 +339,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3A1E2E291F71B59200A7B165 /* main.m in Sources */,
-				3B7DB4B22224728500E6FD4F /* AAPLTriangle.m in Sources */,
 				3A70731E1EBD4A67001F05E4 /* AAPLRenderer.m in Sources */,
 				3A1E2E1D1F71B4DC00A7B165 /* AAPLViewController.m in Sources */,
 				3A1E2E211F71B4E300A7B165 /* AAPLAppDelegate.m in Sources */,
@@ -355,9 +351,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				3A7073251EBD4A67001F05E4 /* AAPLShaders.metal in Sources */,
+				E18F367E28CF29C0004C2340 /* AAPLSquare.m in Sources */,
 				3A1E2E1F1F71B4DD00A7B165 /* AAPLViewController.m in Sources */,
 				3A1E2E271F71B59200A7B165 /* main.m in Sources */,
-				3B7DB4B02224728500E6FD4F /* AAPLTriangle.m in Sources */,
 				3A70731F1EBD4A67001F05E4 /* AAPLRenderer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

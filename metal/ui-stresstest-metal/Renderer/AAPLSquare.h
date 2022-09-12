@@ -2,13 +2,13 @@
 See LICENSE folder for this sample’s licensing information.
 
 Abstract:
-Header for a simple class that represents a colored triangle object.
+Header for a simple class that represents a colored square object.
 */
 
 @import MetalKit;
 #import "AAPLShaderTypes.h"
 
-@interface AAPLTriangle : NSObject
+@interface AAPLSquare : NSObject
 
 @property (nonatomic) vector_float2 position;
 @property (nonatomic) vector_float4 color;

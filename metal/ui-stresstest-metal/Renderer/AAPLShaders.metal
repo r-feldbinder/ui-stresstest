@@ -20,8 +20,8 @@ struct RasterizerData
     float4 position [[position]];
 
     // Since this member does not have a special attribute qualifier, the rasterizer interpolates
-    // its value with values of other vertices making up the triangle and passes the interpolated
-    // value to the fragment shader for each fragment in that triangle.
+    // its value with values of other vertices making up the square and passes the interpolated
+    // value to the fragment shader for each fragment in that square.
     float4 color;
 
 };
