@@ -35,6 +35,7 @@ static const vector_float4 Colors[] =
     { 0.5, 0.5, 0.2, 1.0 },
 };
 static const NSUInteger NumColors = 7;
+static const vector_float4 Gray = { 0.5, 0.5, 0.5, 1.0 };
 
 
 // The main class performing the rendering.
@@ -57,7 +58,7 @@ static const NSUInteger NumColors = 7;
 
     NSUInteger _totalVertexCount;
 
-    float _wavePosition;
+    float _floatingPosition;
 }
 
 /// Initializes the renderer with the MetalKit view from which you obtain the Metal device.
@@ -99,7 +100,7 @@ static const NSUInteger NumColors = 7;
 
         // Calculate vertex data and allocate vertex buffers.
         const NSUInteger squareVertexCount = [AAPLSquare vertexCount];
-        _totalVertexCount = NumSquares * NumSquares * squareVertexCount;
+        _totalVertexCount = (NumSquares * NumSquares + 1) * squareVertexCount;
         const NSUInteger squareVertexBufferSize = _totalVertexCount * sizeof(AAPLVertex);
 
         for(NSUInteger bufferIndex = 0; bufferIndex < MaxFramesInFlight; bufferIndex++)
@@ -108,6 +109,8 @@ static const NSUInteger NumColors = 7;
                                                                options:MTLResourceStorageModeShared];
             _vertexBuffers[bufferIndex].label = [NSString stringWithFormat:@"Vertex Buffer #%lu", (unsigned long)bufferIndex];
         }
+        
+        _floatingPosition = 0;
     }
     return self;
 }
@@ -140,6 +143,19 @@ static const NSUInteger NumColors = 7;
                 currentVertex++;
             }
         }
+    }
+    
+    const float floatingSize = NormalSize * 10;
+    const float floatingSpeed = 0.05;
+    _floatingPosition = _floatingPosition + floatingSpeed;
+    float xy = sin(_floatingPosition) * (1 - floatingSize);
+    vector_float2 pos = {-xy - floatingSize, xy - floatingSize};
+    
+    for(NSUInteger vertex = 0; vertex < squareVertexCount; vertex++)
+    {
+        currentSquareVertices[currentVertex].position = squareVertices[vertex].position * floatingSize + pos;
+        currentSquareVertices[currentVertex].color = Gray;
+        currentVertex++;
     }
 }
 
