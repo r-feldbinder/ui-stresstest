@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    margin: 0px;
+}
+
+.row {
+    float: left;
+}
+
+#floating_square {
+  width: 100px;
+  height: 100px;
+  background-color: gray;
+  position: absolute;
+  animation-name: move_diagonal;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes move_diagonal {
+  0%   {left:0px; top:0px;}
+  50% {left:90vw; top:90vh;}
+  100%   {left:0px; top:0px;}
+}
+</style>
+
+</head>
+<body>
+<div id="grid"></div>
+<div id="floating_square"></div>
+
+<script>
+    var squareCount = 80;
+    var colors = ["green", "red", "blue", "yellow", "magenta", "olive", "cyan"]
+    var e = document.getElementById("grid");
+    var colorIndex = 0;
+    for(var i = 0; i < squareCount; i++){ 
+        var row = document.createElement("div"); 
+        row.className = "row"; 
+        for(var x = 0; x < squareCount; x++){ 
+            var cell = document.createElement("div"); 
+            cell.className = "cell";
+            cell.style.backgroundColor = colors[colorIndex % colors.length];
+            cell.style.width = 100 / squareCount + "vw";
+            cell.style.height =  100 / squareCount + "vh";
+            row.appendChild(cell);
+            colorIndex++;
+        } 
+        e.appendChild(row); 
+    } 
+    </script>
+</body>
+</html>
+
+
