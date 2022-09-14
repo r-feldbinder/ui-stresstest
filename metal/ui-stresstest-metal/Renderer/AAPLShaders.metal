@@ -29,8 +29,7 @@ struct RasterizerData
 // Vertex shader.
 vertex RasterizerData
 vertexShader(const uint vertexID [[ vertex_id ]],
-             const device AAPLVertex *vertices [[ buffer(AAPLVertexInputIndexVertices) ]],
-             constant vector_uint2 *viewportSizePointer  [[ buffer(AAPLVertexInputIndexViewportSize) ]])
+             const device AAPLVertex *vertices [[ buffer(AAPLVertexInputIndexVertices) ]])
 {
     RasterizerData out;
 
@@ -38,13 +37,8 @@ vertexShader(const uint vertexID [[ vertex_id ]],
     // Positions are specified in pixel dimensions (i.e. a value of 100 is 100 pixels from the origin).
     float2 pixelSpacePosition = vertices[vertexID].position.xy;
 
-    // Get the viewport size and cast to float.
-    vector_float2 viewportSize = vector_float2(*viewportSizePointer);
-
-    // To convert from positions in pixel space to positions in clip-space,
-    // divide the pixel coordinates by half the size of the viewport.
     out.position = vector_float4(0.0, 0.0, 0.0, 1.0);
-    out.position.xy = pixelSpacePosition / (viewportSize / 2.0);
+    out.position.xy = pixelSpacePosition;
 
     // Pass the input color straight to the output color.
     out.color = vertices[vertexID].color;

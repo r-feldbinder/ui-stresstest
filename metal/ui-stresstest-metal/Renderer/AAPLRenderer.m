@@ -15,7 +15,27 @@ Implementation for a renderer class that performs Metal setup and per-frame rend
 static const NSUInteger MaxFramesInFlight = 3;
 
 // The number of squares in the scene, determined to fit the screen.
-static const NSUInteger NumSquares = 50;
+static const NSUInteger NumSquares = 80;
+static const float NormalSize = 1.0 / NumSquares;
+
+float lerpf(float a, float b, float t)
+{
+    return a + t * (b - a);
+}
+
+// Array of colors.
+static const vector_float4 Colors[] =
+{
+    { 0.8, 0.2, 0.2, 1.0 },
+    { 0.2, 0.8, 0.2, 1.0 },
+    { 0.2, 0.2, 0.8, 1.0 },
+    { 0.8, 0.2, 0.8, 1.0 },
+    { 0.2, 0.8, 0.8, 1.0 },
+    { 0.8, 0.8, 0.2, 1.0 },
+    { 0.5, 0.5, 0.2, 1.0 },
+};
+static const NSUInteger NumColors = 7;
+
 
 // The main class performing the rendering.
 @implementation AAPLRenderer
@@ -34,10 +54,6 @@ static const NSUInteger NumSquares = 50;
     id<MTLCommandQueue> _commandQueue;
 
     id<MTLRenderPipelineState> _pipelineState;
-
-    vector_uint2 _viewportSize;
-
-    NSArray<AAPLSquare*> *_squares;
 
     NSUInteger _totalVertexCount;
 
@@ -81,12 +97,9 @@ static const NSUInteger NumSquares = 50;
         // Create the command queue.
         _commandQueue = [_device newCommandQueue];
 
-        // Generate the squares rendered by the app.
-        [self generateSquares];
-
         // Calculate vertex data and allocate vertex buffers.
         const NSUInteger squareVertexCount = [AAPLSquare vertexCount];
-        _totalVertexCount = squareVertexCount * _squares.count;
+        _totalVertexCount = NumSquares * NumSquares * squareVertexCount;
         const NSUInteger squareVertexBufferSize = _totalVertexCount * sizeof(AAPLVertex);
 
         for(NSUInteger bufferIndex = 0; bufferIndex < MaxFramesInFlight; bufferIndex++)
@@ -99,79 +112,33 @@ static const NSUInteger NumSquares = 50;
     return self;
 }
 
-/// Generates an array of squares, initializing each and inserting it into `_squares`.
-- (void)generateSquares
-{
-    // Array of colors.
-    const vector_float4 Colors[] =
-    {
-        { 1.0, 0.0, 0.0, 1.0 },  // Red
-        { 0.0, 1.0, 0.0, 1.0 },  // Green
-        { 0.0, 0.0, 1.0, 1.0 },  // Blue
-        { 1.0, 0.0, 1.0, 1.0 },  // Magenta
-        { 0.0, 1.0, 1.0, 1.0 },  // Cyan
-        { 1.0, 1.0, 0.0, 1.0 },  // Yellow
-    };
-
-    const NSUInteger NumColors = sizeof(Colors) / sizeof(vector_float4);
-
-    // Horizontal spacing between each square.
-    const float horizontalSpacing = 16;
-
-    NSMutableArray *squares = [[NSMutableArray alloc] initWithCapacity:NumSquares];
-    
-    // Initialize each square.
-    for(NSUInteger t = 0; t < NumSquares; t++)
-    {
-        vector_float2 squarePosition;
-
-        // Determine the starting position of the square in a horizontal line.
-        squarePosition.x = ((-((float)NumSquares) / 2.0) + t) * horizontalSpacing;
-        squarePosition.y = 0.0;
-
-        // Create the square, set its properties, and add it to the array.
-        AAPLSquare * square = [AAPLSquare new];
-        square.position = squarePosition;
-        square.color = Colors[t % NumColors];
-        [squares addObject:square];
-    }
-    _squares = squares;
-}
 
 /// Updates the position of each square and also updates the vertices for each square in the current buffer.
 - (void)updateState
 {
-    // Simplified wave properties.
-    const float waveMagnitude = 128.0;  // Vertical displacement.
-    const float waveSpeed     = 0.05;   // Displacement change from the previous frame.
-
-    // Increment wave position from the previous frame
-    _wavePosition += waveSpeed;
-
     // Vertex data for a single default square.
     const AAPLVertex *squareVertices = [AAPLSquare vertices];
     const NSUInteger squareVertexCount = [AAPLSquare vertexCount];
 
     // Vertex data for the current squares.
     AAPLVertex *currentSquareVertices = _vertexBuffers[_currentBuffer].contents;
+    NSUInteger currentVertex = 0;
 
-    // Update each square.
-    for(NSUInteger square = 0; square < NumSquares; square++)
+    for(NSUInteger row = 0; row < NumSquares; row++)
     {
-        vector_float2 squarePosition = _squares[square].position;
-
-        // Displace the y-position of the square using a sine wave.
-        squarePosition.y = (sin(squarePosition.x/waveMagnitude + _wavePosition) * waveMagnitude);
-
-        // Update the position of the square.
-        _squares[square].position = squarePosition;
-
-        // Update the vertices of the current vertex buffer with the square's new position.
-        for(NSUInteger vertex = 0; vertex < squareVertexCount; vertex++)
+        float y = lerpf(-1, 1, (float)row / NumSquares * 1.0);
+        
+        for(NSUInteger column = 0; column < NumSquares; column++)
         {
-            NSUInteger currentVertex = vertex + (square * squareVertexCount);
-            currentSquareVertices[currentVertex].position = squareVertices[vertex].position + _squares[square].position;
-            currentSquareVertices[currentVertex].color = _squares[square].color;
+            float x = lerpf(-1, 1, (float)column / NumSquares * 1.0);
+            vector_float2 pos = {x, y};
+
+            for(NSUInteger vertex = 0; vertex < squareVertexCount; vertex++)
+            {
+                currentSquareVertices[currentVertex].position = squareVertices[vertex].position * NormalSize + pos;
+                currentSquareVertices[currentVertex].color = Colors[(row + column) % NumColors];
+                currentVertex++;
+            }
         }
     }
 }
@@ -181,13 +148,6 @@ static const NSUInteger NumSquares = 50;
 /// Handles view orientation or size changes.
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
 {
-    // Regenerate the squares.
-    [self generateSquares];
-
-    // Save the size of the drawable as you'll pass these
-    // values to the vertex shader when you render.
-    _viewportSize.x = size.width;
-    _viewportSize.y = size.height;
 }
 
 /// Handles view rendering for a new frame.
@@ -221,11 +181,6 @@ static const NSUInteger NumSquares = 50;
         [renderEncoder setVertexBuffer:_vertexBuffers[_currentBuffer]
                                 offset:0
                                atIndex:AAPLVertexInputIndexVertices];
-
-        // Set the viewport size.
-        [renderEncoder setVertexBytes:&_viewportSize
-                               length:sizeof(_viewportSize)
-                              atIndex:AAPLVertexInputIndexViewportSize];
 
         // Draw the square vertices.
         [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle

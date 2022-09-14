@@ -10,9 +10,6 @@ Header for a simple class that represents a colored square object.
 
 @interface AAPLSquare : NSObject
 
-@property (nonatomic) vector_float2 position;
-@property (nonatomic) vector_float4 color;
-
 +(const AAPLVertex*)vertices;
 +(NSUInteger)vertexCount;
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    let numPerRowColumn = 80 // higher numbers will generate more load
+    let numPerRowColumn = 10 // higher numbers will generate more load
     let colors: [Color] = [.red, .orange, .yellow, .green, .cyan, .purple, .blue]
  
     @State private var offsetX: CGFloat = 0

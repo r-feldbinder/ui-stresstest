@@ -14,17 +14,16 @@ Implementation for a simple class that represents a colored square object.
 /// The default color is white.
 +(const AAPLVertex *)vertices
 {
-    const float SquareSize = 64;
     static const AAPLVertex squareVertices[] =
     {
-        // Pixel Positions,                          RGBA colors.
-        { { -0.5*SquareSize, -0.5*SquareSize },  { 1, 1, 1, 1 } },
-        { { -0.5*SquareSize, +0.5*SquareSize },  { 1, 1, 1, 1 } },
-        { { +0.5*SquareSize, -0.5*SquareSize },  { 1, 1, 1, 1 } },
+        // Positions,RGBA colors.
+        { { 0, 0 },  { 1, 1, 1, 1 } },
+        { { 0, 2 },  { 1, 1, 1, 1 } },
+        { { 2, 0 },  { 1, 1, 1, 1 } },
         
-        { { -0.5*SquareSize, +0.5*SquareSize },  { 1, 1, 1, 1 } },
-        { { +0.5*SquareSize, -0.5*SquareSize },  { 1, 1, 1, 1 } },
-        { { +0.5*SquareSize, +0.5*SquareSize },  { 1, 1, 1, 1 } }
+        { { 0, 2 },  { 1, 1, 1, 1 } },
+        { { 2, 0 },  { 1, 1, 1, 1 } },
+        { { 2, 2 },  { 1, 1, 1, 1 } }
     };
     return squareVertices;
 }
